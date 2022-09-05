@@ -44,46 +44,56 @@ class MainFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        if (viewModel.checkForInternet(requireContext())){
+        if (viewModel.checkForInternet(requireContext())) {
 
+            viewModel.getAstroids()
+            viewModel.getPicture()
             viewModel.response.observe(viewLifecycleOwner, Observer { response ->
 
                 viewModel.adapter = RV_Adapter(viewModel.response.value!!)
                 asteroid_recycler.adapter = viewModel.adapter
                 asteroid_recycler.layoutManager = LinearLayoutManager(activity)
-                viewModel.adapter.setOnItemClick(object : RV_Adapter.OnItemClick{
+                viewModel.adapter.setOnItemClick(object : RV_Adapter.OnItemClick {
                     override fun OnItemClick(position: Int) {
                         //todo: pass astroid to detail fragment
 
-                        findNavController().navigate(MainFragmentDirections.actionShowDetail(viewModel.response.value!![position]))
+                        findNavController().navigate(
+                            MainFragmentDirections.actionShowDetail(
+                                viewModel.response.value!![position]
+                            )
+                        )
                     }
-                }  )
+                })
                 GlobalScope.launch {
                     database.insertAll(viewModel.response.value!!)
                 }
 
 
-            }) }
-        else{
-          //  Toast.makeText(context,"Offline mode",Toast.LENGTH_SHORT).show()
-           try {
-               GlobalScope.launch {
-                      viewModel.arraylist=database.getAll() as ArrayList<Asteroid>
-                   viewModel.adapter= RV_Adapter(viewModel.arraylist)
-                   asteroid_recycler.adapter = viewModel.adapter
-                   asteroid_recycler.layoutManager = LinearLayoutManager(activity)
+            })
+        } else {
+            //  Toast.makeText(context,"Offline mode",Toast.LENGTH_SHORT).show()
+            try {
+                GlobalScope.launch {
+                    viewModel.arraylist = database.getAll() as ArrayList<Asteroid>
+                    viewModel.adapter = RV_Adapter(viewModel.arraylist)
+                    asteroid_recycler.adapter = viewModel.adapter
+                    asteroid_recycler.layoutManager = LinearLayoutManager(activity)
 
-                   viewModel.adapter.setOnItemClick(object : RV_Adapter.OnItemClick{
-                       override fun OnItemClick(position: Int) {
-                           //todo: pass astroid to detail fragment
+                    viewModel.adapter.setOnItemClick(object : RV_Adapter.OnItemClick {
+                        override fun OnItemClick(position: Int) {
+                            //todo: pass astroid to detail fragment
 
-                           findNavController().navigate(MainFragmentDirections.actionShowDetail(viewModel.arraylist[position]))
-                       }
-                   }  )
+                            findNavController().navigate(
+                                MainFragmentDirections.actionShowDetail(
+                                    viewModel.arraylist[position]
+                                )
+                            )
+                        }
+                    })
 
-               }
-            }catch (E:Exception){
-               // Toast.makeText(context, "Try again", Toast.LENGTH_SHORT).show()
+                }
+            } catch (E: Exception) {
+                // Toast.makeText(context, "Try again", Toast.LENGTH_SHORT).show()
             }
 
 
@@ -116,7 +126,6 @@ class MainFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return true
     }
-
 
 
 }

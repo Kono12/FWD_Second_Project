@@ -30,8 +30,7 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
 
 
     init {
-        getAstroids()
-        getPicture()
+
     }
 
     fun getAstroids() {
@@ -40,7 +39,7 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
                 response.value = repository.getAstroids()
             } catch (e: Exception) {
                 e.printStackTrace()
-               // getAstroids()
+                getAstroids()
             }
         }
     }
