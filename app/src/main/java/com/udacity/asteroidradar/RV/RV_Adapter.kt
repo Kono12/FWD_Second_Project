@@ -8,7 +8,7 @@ import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.R
 import kotlinx.android.synthetic.main.rv_card.view.*
 
-class RV_Adapter(var arrayList: ArrayList<Asteroid>) :
+class RV_Adapter(var arrayList: List<Asteroid>) :
     RecyclerView.Adapter<RV_Adapter.RV_ViewHolder>() {
 
     inner class RV_ViewHolder(item: View) : RecyclerView.ViewHolder(item) {
@@ -26,10 +26,10 @@ class RV_Adapter(var arrayList: ArrayList<Asteroid>) :
            date.text=arrayList[position].closeApproachDate
             if (arrayList[position].isPotentiallyHazardous)
             {
-                //Todo:Set Image hazard
+                img_status.setImageResource(R.drawable.ic_status_potentially_hazardous)
             }else
             {
-              //todo: not hazardous
+                img_status.setImageResource(R.drawable.ic_status_normal)
             }
         }
     }

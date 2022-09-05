@@ -20,9 +20,3 @@ data class Asteroid(
     val isPotentiallyHazardous: Boolean
 ) : Parcelable
 
-
-data class AstroidResponse(
-    @SerializedName("near_earth_objects" )
-    val nearEarthObjects: List<Asteroid>
-
-)

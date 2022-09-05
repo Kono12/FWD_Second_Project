@@ -1,8 +1,6 @@
 package com.udacity.asteroidradar.api
 
-import android.telecom.Call
-import com.udacity.asteroidradar.Asteroid
-import com.udacity.asteroidradar.AstroidResponse
+
 import com.udacity.asteroidradar.PictureOfDay
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -16,5 +14,5 @@ interface ApiInterface {
             @Query("api_key") apiKey: String): String
 
         @GET("planetary/apod")
-        suspend fun getPictureOfDay(@Query("api_key") apiKey: String) : PictureOfDay
+        suspend fun getPictureOfDay(@Query("api_key") ApiKey: String) : PictureOfDay
     }

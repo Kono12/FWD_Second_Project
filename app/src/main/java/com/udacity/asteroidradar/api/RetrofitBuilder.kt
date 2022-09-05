@@ -13,13 +13,18 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 object RetrofitBuilder {
 
+    private val moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
 
     private val retrofit by lazy {
         Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .baseUrl(BASE_URL)
             .build()
     }
+
         val retrofitService : ApiInterface by lazy{
             retrofit.create(ApiInterface::class.java)
         }

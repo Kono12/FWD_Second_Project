@@ -13,5 +13,9 @@ interface DB_Dao {
     fun getAll(): LiveData<List<Asteroid>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(asteroids: List<Asteroid>)
+    fun insertAll(asteroid: List<Asteroid>)
+
+    @Query("DELETE  FROM Asteroid")
+    fun clear()
+
 }
