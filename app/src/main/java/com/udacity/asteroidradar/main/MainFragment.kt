@@ -1,13 +1,19 @@
 package com.udacity.asteroidradar.main
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.DB.DataBaseClass
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.RV.RV_Adapter
@@ -35,25 +41,55 @@ class MainFragment : Fragment() {
         val viewModelFactory = MainViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
-        GlobalScope.launch {
-            try {
-            getDataBaseDataToRV()}
-            catch (e : Exception){}
-        }
 
         binding.viewModel = viewModel
 
-        viewModel.response.observe(viewLifecycleOwner, Observer { response ->
+        if (viewModel.checkForInternet(requireContext())){
 
-            viewModel.adapter = RV_Adapter(viewModel.response.value!!)
-            asteroid_recycler.adapter = viewModel.adapter
-            asteroid_recycler.layoutManager = LinearLayoutManager(activity)
-            GlobalScope.launch {
-                try {
-                    refreshData()
-                }catch (E:Exception){}
+            viewModel.response.observe(viewLifecycleOwner, Observer { response ->
+
+                viewModel.adapter = RV_Adapter(viewModel.response.value!!)
+                asteroid_recycler.adapter = viewModel.adapter
+                asteroid_recycler.layoutManager = LinearLayoutManager(activity)
+                viewModel.adapter.setOnItemClick(object : RV_Adapter.OnItemClick{
+                    override fun OnItemClick(position: Int) {
+                        //todo: pass astroid to detail fragment
+
+                        findNavController().navigate(MainFragmentDirections.actionShowDetail(viewModel.response.value!![position]))
+                    }
+                }  )
+                GlobalScope.launch {
+                    database.insertAll(viewModel.response.value!!)
+                }
+
+
+            }) }
+        else{
+          //  Toast.makeText(context,"Offline mode",Toast.LENGTH_SHORT).show()
+           try {
+               GlobalScope.launch {
+                      viewModel.arraylist=database.getAll() as ArrayList<Asteroid>
+                   viewModel.adapter= RV_Adapter(viewModel.arraylist)
+                   asteroid_recycler.adapter = viewModel.adapter
+                   asteroid_recycler.layoutManager = LinearLayoutManager(activity)
+
+                   viewModel.adapter.setOnItemClick(object : RV_Adapter.OnItemClick{
+                       override fun OnItemClick(position: Int) {
+                           //todo: pass astroid to detail fragment
+
+                           findNavController().navigate(MainFragmentDirections.actionShowDetail(viewModel.arraylist[position]))
+                       }
+                   }  )
+
+               }
+            }catch (E:Exception){
+               // Toast.makeText(context, "Try again", Toast.LENGTH_SHORT).show()
             }
-        })
+
+
+        }
+
+
 
         viewModel.pic.observe(viewLifecycleOwner, Observer { pic ->
             Log.i("ResponseAstroids", "pic is here $pic ")
@@ -81,19 +117,6 @@ class MainFragment : Fragment() {
         return true
     }
 
-
-
-
-    suspend fun refreshData() {
-        database.clear()
-        database.insertAll(viewModel.response.value!!)
-    }
-
-    suspend fun getDataBaseDataToRV() {
-        viewModel.response.value!!.clear()
-        viewModel.response.value!!.addAll(database.getAll().value!!)
-        viewModel.adapter.notifyDataSetChanged()
-    }
 
 
 }

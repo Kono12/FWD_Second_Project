@@ -1,6 +1,10 @@
 package com.udacity.asteroidradar.main
 
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,10 +18,10 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
 
-    val response: MutableLiveData<ArrayList<Asteroid>> = MutableLiveData()
+    var arraylist: ArrayList<Asteroid> = ArrayList<Asteroid>()
+    val response: MutableLiveData<List<Asteroid>> = MutableLiveData()
 
 
-    var hasItems : Boolean= false
     private val _pic = MutableLiveData<PictureOfDay>()
     val pic: LiveData<PictureOfDay>
         get() = _pic
@@ -34,7 +38,6 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         viewModelScope.launch {
             try {
                 response.value = repository.getAstroids()
-
             } catch (e: Exception) {
                 e.printStackTrace()
                // getAstroids()
@@ -55,7 +58,22 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
 
 
 
-
-
+     fun checkForInternet(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return when {
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                else -> false
+            }
+        } else {
+            @Suppress("DEPRECATION") val networkInfo =
+                connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
+    }
 
 }
