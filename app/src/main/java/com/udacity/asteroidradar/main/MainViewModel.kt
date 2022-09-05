@@ -1,5 +1,6 @@
 package com.udacity.asteroidradar.main
 
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,13 +10,14 @@ import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.RV.RV_Adapter
 import com.udacity.asteroidradar.Repository
 import kotlinx.coroutines.launch
-import java.lang.Exception
+
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
 
+    val response: MutableLiveData<ArrayList<Asteroid>> = MutableLiveData()
 
-    val response: MutableLiveData<List<Asteroid>> = MutableLiveData()
 
+    var hasItems : Boolean= false
     private val _pic = MutableLiveData<PictureOfDay>()
     val pic: LiveData<PictureOfDay>
         get() = _pic
@@ -32,8 +34,10 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         viewModelScope.launch {
             try {
                 response.value = repository.getAstroids()
+
             } catch (e: Exception) {
                 e.printStackTrace()
+               // getAstroids()
             }
         }
     }
@@ -44,9 +48,14 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
                 _pic.value = repository.getPic()
             } catch (e: Exception) {
                 e.printStackTrace()
+            //    getPicture()
             }
         }
     }
+
+
+
+
 
 
 }
